@@ -1,0 +1,26 @@
+---
+import Layout from './Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getDocsNavigation } from '../utils/docs.utils';
+
+interface Props {
+  title: string;
+  description?: string;
+  currentSlug?: string;
+}
+
+const { title, description, currentSlug } = Astro.props;
+const categories = await getDocsNavigation();
+---
+
+<Layout title={title} description={description}>
+  <div class="flex min-h-screen">
+    <Sidebar categories={categories} currentSlug={currentSlug} />
+    
+    <main class="flex-1 ml-64">
+      <div class="max-w-4xl mx-auto px-8 py-12">
+        <slot />
+      </div>
+    </main>
+  </div>
+</Layout>
