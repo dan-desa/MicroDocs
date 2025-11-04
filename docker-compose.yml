@@ -1,37 +1,91 @@
-# docker-compose.yml
-version: '3.8'
+# docker-compose.yml - Archivos externos (servidor remoto)
+#version: '3.8'
+#
+#services:
+#  microdocs:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      args:
+#        DOCS_BASE_PATH: https://mi-servidor.com/docs
+#        DOCS_IS_EXTERNAL: "true"
+#    container_name: microdocs-app
+#    ports:
+#      - "4321:4321"
+#    environment:
+#      - NODE_ENV=production
+#      - HOST=0.0.0.0
+#      - PORT=4321
+#      - DOCS_BASE_PATH=https://mi-servidor.com/docs
+#      - DOCS_IS_EXTERNAL=true
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4321/', (r) => r.statusCode === 200 ? #process.exit(0) : process.exit(1))"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 40s
 
-services:
-  microdocs:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        # Para archivos externos (servidor remoto)
-        DOCS_BASE_PATH: ${DOCS_BASE_PATH:-https://mi-servidor.com/docs}
-        DOCS_IS_EXTERNAL: ${DOCS_IS_EXTERNAL:-true}
-    container_name: microdocs-app
-    ports:
-      - "4321:4321"
-    environment:
-      - NODE_ENV=production
-      - HOST=0.0.0.0
-      - PORT=4321
-      # Runtime environment variables
-      - DOCS_BASE_PATH=${DOCS_BASE_PATH:-https://mi-servidor.com/docs}
-      - DOCS_IS_EXTERNAL=${DOCS_IS_EXTERNAL:-true}
-    restart: unless-stopped
-    
-    # Opcional: Si usas archivos locales en el mismo servidor
-    # volumes:
-    #   - /ruta/host/docs-content:/app/docs-content:ro
+# ============================================
+# ALTERNATIVA 1: Archivos locales FUERA de Docker
+# ============================================
+# Descomentar para usar archivos del host:
+#
+ services:
+   microdocs:
+     build:
+       context: .
+       dockerfile: Dockerfile
+       args:
+         DOCS_BASE_PATH: /app/docs-content
+         DOCS_IS_EXTERNAL: "false"
+     container_name: microdocs-app
+     ports:
+       - "4321:4321"
+     environment:
+       - NODE_ENV=production
+       - HOST=0.0.0.0
+       - PORT=4321
+       - DOCS_BASE_PATH=/app/docs-content
+       - DOCS_IS_EXTERNAL=false
+     volumes:
+       # Ruta absoluta en Windows
+       - C:/Dev/learning/MicroDocs_content/docs-content:/app/docs-content:ro
+       # Ruta absoluta en Linux/Mac
+       # - /home/user/MicroDocs_content/docs-content:/app/docs-content:ro
+     restart: unless-stopped
 
-  # Opcional: Servidor de archivos nginx para docs-content
-  # docs-fileserver:
-  #   image: nginx:alpine
-  #   container_name: microdocs-fileserver
-  #   ports:
-  #     - "8080:80"
-  #   volumes:
-  #     - ../MicroDocs_content/docs-content:/usr/share/nginx/html/docs:ro
-  #   restart: unless-stopped
+# ============================================
+# ALTERNATIVA 2: Con servidor nginx para servir archivos
+# ============================================
+#
+# services:
+#   microdocs:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#       args:
+#         DOCS_BASE_PATH: http://docs-fileserver/docs
+#         DOCS_IS_EXTERNAL: "true"
+#     container_name: microdocs-app
+#     ports:
+#       - "4321:4321"
+#     environment:
+#       - NODE_ENV=production
+#       - HOST=0.0.0.0
+#       - PORT=4321
+#       - DOCS_BASE_PATH=http://docs-fileserver/docs
+#       - DOCS_IS_EXTERNAL=true
+#     depends_on:
+#       - docs-fileserver
+#     restart: unless-stopped
+#
+#   docs-fileserver:
+#     image: nginx:alpine
+#     container_name: microdocs-fileserver
+#     ports:
+#       - "8080:80"
+#     volumes:
+#       - C:/Dev/learning/MicroDocs_content/docs-content:/usr/share/nginx/html/docs:ro
+#       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+#     restart: unless-stopped

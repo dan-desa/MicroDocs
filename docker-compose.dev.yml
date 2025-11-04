@@ -1,0 +1,21 @@
+# docker-compose.dev.yml - Desarrollo con hot-reload
+version: '3.8'
+
+services:
+  microdocs-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: microdocs-dev
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=development
+      - DOCS_BASE_PATH=/app/docs-content
+      - DOCS_IS_EXTERNAL=false
+    volumes:
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - C:/Dev/learning/MicroDocs_content/docs-content:/app/docs-content:ro
+    command: pnpm dev
+    restart: unless-stopped

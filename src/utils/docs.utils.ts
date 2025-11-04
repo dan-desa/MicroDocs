@@ -13,7 +13,11 @@ async function fetchExternalFile(url: string): Promise<string> {
 }
 
 async function readLocalFile(path: string): Promise<string> {
-  return readFile(path, 'utf-8');
+  try {
+    return await readFile(path, 'utf-8');
+  } catch (error) {
+    throw new Error(`Cannot read local file at ${path}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getMarkdownContent(slug: string) {
@@ -24,13 +28,14 @@ export async function getMarkdownContent(slug: string) {
     
     if (DOCS_CONFIG.isExternal) {
       const url = `${DOCS_CONFIG.basePath}/${sanitized}.md`;
+      console.log(`Fetching external file: ${url}`);
       rawContent = await fetchExternalFile(url);
     } else {
-      // Validar que basePath existe antes de usarlo
       if (!DOCS_CONFIG.basePath) {
-        throw new Error('basePath is not configured');
+        throw new Error('DOCS_BASE_PATH is not configured for local files');
       }
       const filePath = join(DOCS_CONFIG.basePath, `${sanitized}.md`);
+      console.log(`Reading local file: ${filePath}`);
       rawContent = await readLocalFile(filePath);
     }
     
@@ -44,7 +49,8 @@ export async function getMarkdownContent(slug: string) {
     
     return parsed;
   } catch (error) {
-    console.error(`Error loading markdown for slug: ${slug}`, error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`Error loading markdown for slug "${slug}":`, errorMessage);
     return null;
   }
 }
@@ -95,18 +101,21 @@ export async function getDocsNavigation(): Promise<DocCategory[]> {
     let pages: DocPage[];
     
     if (DOCS_CONFIG.isExternal) {
-      // Para servidor externo, necesitas un endpoint que liste archivos
       const indexUrl = `${DOCS_CONFIG.basePath}/index.json`;
+      console.log(`Fetching docs index from: ${indexUrl}`);
       const response = await fetch(indexUrl);
       if (!response.ok) {
-        throw new Error(`Cannot fetch docs index from ${indexUrl}: ${response.status}`);
+        throw new Error(`Cannot fetch docs index from ${indexUrl}: HTTP ${response.status}`);
       }
       pages = await response.json();
+      console.log(`✓ Loaded ${pages.length} pages from external index`);
     } else {
       if (!DOCS_CONFIG.basePath) {
-        throw new Error('basePath is not configured');
+        throw new Error('DOCS_BASE_PATH is not configured for local files');
       }
+      console.log(`Scanning local directory: ${DOCS_CONFIG.basePath}`);
       pages = await scanLocalDirectory(DOCS_CONFIG.basePath);
+      console.log(`✓ Found ${pages.length} pages in local directory`);
     }
     
     // Filtrar páginas en borrador
