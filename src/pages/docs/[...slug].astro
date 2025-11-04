@@ -1,44 +1,43 @@
 ---
-import { getCollection } from 'astro:content';
 import DocsLayout from '../../layouts/DocsLayout.astro';
 import MarkdownContent from '../../components/MarkdownContent.astro';
+import { getMarkdownContent } from '../../utils/docs.utils';
 
-export const prerender = true;
+const { slug } = Astro.params;
 
-export async function getStaticPaths() {
-  const docs = await getCollection('docs', ({ data }) => {
-    return data.draft !== true;
-  });
-
-  return docs.map((doc) => ({
-    params: { slug: doc.slug },
-    props: { doc },
-  }));
+// Validación de slug
+if (!slug || typeof slug !== 'string') {
+  return Astro.redirect('/404');
 }
 
-const { doc } = Astro.props;
-const { Content } = await doc.render();
+// Obtener contenido
+const doc = await getMarkdownContent(slug);
+
+// Validar documento y borrador
+if (!doc || doc.frontmatter.draft) {
+  return Astro.redirect('/404');
+}
 ---
 
 <DocsLayout 
-  title={doc.data.title} 
-  description={doc.data.description}
-  currentSlug={doc.slug}
+  title={doc.frontmatter.title} 
+  description={doc.frontmatter.description}
+  currentSlug={slug}
 >
   <article>
     <header class="mb-8">
       <h1 class="text-4xl font-bold text-gray-900 mb-2">
-        {doc.data.title}
+        {doc.frontmatter.title}
       </h1>
-      {doc.data.description && (
+      {doc.frontmatter.description && (
         <p class="text-xl text-gray-600">
-          {doc.data.description}
+          {doc.frontmatter.description}
         </p>
       )}
     </header>
 
     <MarkdownContent>
-      <Content />
+      <div set:html={doc.content} />
     </MarkdownContent>
   </article>
 </DocsLayout>

@@ -1,0 +1,37 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  microdocs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Para archivos externos (servidor remoto)
+        DOCS_BASE_PATH: ${DOCS_BASE_PATH:-https://mi-servidor.com/docs}
+        DOCS_IS_EXTERNAL: ${DOCS_IS_EXTERNAL:-true}
+    container_name: microdocs-app
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=4321
+      # Runtime environment variables
+      - DOCS_BASE_PATH=${DOCS_BASE_PATH:-https://mi-servidor.com/docs}
+      - DOCS_IS_EXTERNAL=${DOCS_IS_EXTERNAL:-true}
+    restart: unless-stopped
+    
+    # Opcional: Si usas archivos locales en el mismo servidor
+    # volumes:
+    #   - /ruta/host/docs-content:/app/docs-content:ro
+
+  # Opcional: Servidor de archivos nginx para docs-content
+  # docs-fileserver:
+  #   image: nginx:alpine
+  #   container_name: microdocs-fileserver
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - ../MicroDocs_content/docs-content:/usr/share/nginx/html/docs:ro
+  #   restart: unless-stopped
