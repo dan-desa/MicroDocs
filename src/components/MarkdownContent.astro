@@ -6,125 +6,105 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<div class:list={["prose prose-gray max-w-none", className]}>
+<div class:list={["prose minimal-prose max-w-none", className]}>
   <slot />
 </div>
 
 <style is:global>
-  .prose {
-    color: #374151;
+  /* Estilo base minimalista */
+  .minimal-prose {
+    color: #444;
     max-width: 65ch;
+    --accent: #f39c12; /* naranja suave */
   }
 
-  .prose h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #111827;
-  }
-
-  .prose h2 {
-    font-size: 1.875rem;
+  .minimal-prose h1,
+  .minimal-prose h2,
+  .minimal-prose h3 {
+    color: #222;
     font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: #111827;
-  }
-
-  .prose h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 1.5rem;
     margin-bottom: 0.75rem;
-    color: #111827;
   }
 
-  .prose p {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    line-height: 1.75;
+  .minimal-prose h1 { font-size: 2rem; }
+  .minimal-prose h2 { font-size: 1.5rem; }
+  .minimal-prose h3 { font-size: 1.25rem; }
+
+  .minimal-prose p {
+    margin: 1rem 0;
+    line-height: 1.7;
   }
 
-  .prose a {
-    color: #2563eb;
-    text-decoration: underline;
+  .minimal-prose a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 1px;
   }
 
-  .prose a:hover {
-    color: #1d4ed8;
+  .minimal-prose a:hover {
+    opacity: 0.8;
   }
 
-  .prose code {
-    background-color: #f3f4f6;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
-    font-size: 0.875em;
-    font-weight: 600;
-    color: #111827;
+  .minimal-prose code {
+    background-color: #f5f5f5;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.9em;
   }
 
-  .prose pre {
-    background-color: #1f2937;
-    color: #f9fafb;
+  .minimal-prose pre {
+    background-color: #292929;
+    color: #fafafa;
     padding: 1rem;
-    border-radius: 0.5rem;
+    border-radius: 6px;
     overflow-x: auto;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin: 1.5rem 0;
   }
 
-  .prose pre code {
-    background-color: transparent;
-    padding: 0;
-    color: inherit;
-    font-size: 0.875rem;
-    font-weight: 400;
+  .minimal-prose pre code {
+    background: transparent;
+    font-size: 0.9rem;
   }
 
-  .prose ul, .prose ol {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+  .minimal-prose ul,
+  .minimal-prose ol {
+    margin: 1rem 0;
     padding-left: 1.5rem;
   }
 
-  .prose li {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+  .minimal-prose li {
+    margin: 0.4rem 0;
   }
 
-  .prose blockquote {
-    border-left: 4px solid #e5e7eb;
+  .minimal-prose blockquote {
+    border-left: 3px solid var(--accent);
     padding-left: 1rem;
     font-style: italic;
-    color: #6b7280;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    color: #666;
+    margin: 1.5rem 0;
   }
 
-  .prose img {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-radius: 0.5rem;
+  .minimal-prose img {
+    margin: 1.5rem 0;
+    border-radius: 6px;
   }
 
-  .prose table {
+  .minimal-prose table {
     width: 100%;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin: 1.5rem 0;
     border-collapse: collapse;
   }
 
-  .prose th {
-    background-color: #f9fafb;
+  .minimal-prose th {
+    background: #fafafa;
     font-weight: 600;
-    text-align: left;
     padding: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #ddd;
   }
 
-  .prose td {
+  .minimal-prose td {
     padding: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #ddd;
   }
 </style>
