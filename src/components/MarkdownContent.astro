@@ -1,18 +1,4 @@
 ---
-import './minimal-prose.css';
-
-interface Props {
-  class?: string;
-}
-
-const { class: className } = Astro.props;
----
-
-<div class:list={["prose minimal-prose max-w-none", className]}>
-  <slot />
-</div>
-
----
 interface Props {
   class?: string;
 }
